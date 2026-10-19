@@ -1,0 +1,297 @@
+{
+  "name": "LumaHome - Knowledge Ingestion",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "86130897-6f8e-4417-aa2f-4f224fc2d5be",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"documents\": [\n    {\n      \"source_id\": \"shipping-v1\",\n      \"title\": \"Shipping Policy\",\n      \"type\": \"policy\",\n      \"language\": \"en\",\n      \"synthetic\": true,\n      \"text\": \"LumaHome shipping policy, version 1. Standard shipping is available within the contiguous United States. Orders are processed within 1–2 business days. Standard delivery takes 3–5 business days after dispatch. Business days exclude weekends and US federal holidays. Standard shipping costs $5.99 and is free for orders of $75 or more before tax. Tracking is sent by email after dispatch. Tracking updates may take 24 hours to appear. If tracking says delivered but the package is missing, check nearby entrances and with household members, then wait 24 hours. If it is still missing, contact human support for investigation. The bot cannot access live tracking or confirm an individual order's location. International shipping is not available.\"\n    },\n    {\n      \"source_id\": \"returns-v1\",\n      \"title\": \"Returns and Refunds Policy\",\n      \"type\": \"policy\",\n      \"language\": \"en\",\n      \"synthetic\": true,\n      \"text\": \"LumaHome returns policy, version 1. Customers may request a return within 30 calendar days of delivery. Change-of-mind returns require an unused item in its original packaging with all accessories and proof of purchase. Final-sale items are excluded from change-of-mind returns. Return shipping for eligible change-of-mind returns costs $6.99, deducted from the refund. For damaged, defective, or incorrect items, contact human support with the order number and a description; photos may be requested. Human support determines the remedy and provides prepaid return shipping when a return is required for those cases. Do not promise a refund or replacement before review. Approved refunds are issued to the original payment method within 5–10 business days after the returned item passes inspection. The bot cannot approve returns, issue refunds, or check an individual refund's status. Requests outside the policy require human review.\"\n    },\n    {\n      \"source_id\": \"orders-v1\",\n      \"title\": \"Orders and Payments FAQ\",\n      \"type\": \"faq\",\n      \"language\": \"en\",\n      \"synthetic\": true,\n      \"text\": \"LumaHome orders FAQ, version 1. Accepted payment methods are Visa, Mastercard, American Express, and PayPal. Gift cards and installment payments are not supported. Cancellation and delivery-address changes may be requested before dispatch, but are not guaranteed. Human support must check the order and process any change. After dispatch, cancellation and address changes are unavailable through LumaHome support. For a declined payment, verify billing details, check available funds, and contact the payment provider if the problem continues. Do not ask customers for full card numbers, card security codes, passwords, or one-time passcodes. Duplicate charges and suspected unauthorized transactions require human support review. The bot cannot inspect payments or modify orders.\"\n    },\n    {\n      \"source_id\": \"glowmini-v1\",\n      \"title\": \"GlowMini GM-100 Setup and Troubleshooting Manual\",\n      \"type\": \"manual\",\n      \"language\": \"en\",\n      \"synthetic\": true,\n      \"text\": \"LumaHome fictional GlowMini GM-100 manual, version 1. GlowMini GM-100 is an indoor smart lamp. Use the supplied power adapter and keep the lamp dry. To pair it, connect the phone to a 2.4 GHz Wi-Fi network, enable Bluetooth, open the LumaHome app, and select Add Device, then GlowMini GM-100. The lamp does not support 5 GHz Wi-Fi. Hold the power button for 5 seconds until the indicator blinks blue to enter pairing mode. Error E101 means Wi-Fi connection failed: confirm the network is 2.4 GHz, check the Wi-Fi password, move closer to the router, and retry pairing. Error E202 means the lamp cannot reach the service: check the internet connection, restart the lamp, and retry after 10 minutes. If E101 or E202 persists after these steps, contact human support. A factory reset requires holding the power button for 10 seconds; it erases saved pairing settings. If the lamp smells burnt, sparks, or has a damaged cable, stop using it, disconnect power if safe, and contact human support. Do not attempt internal repairs.\"\n    },\n    {\n      \"source_id\": \"tickets-v1\",\n      \"title\": \"Synthetic Resolved Support Tickets\",\n      \"type\": \"ticket_examples\",\n      \"language\": \"en\",\n      \"synthetic\": true,\n      \"text\": \"Training examples only. Tickets illustrate approved guidance and do not override policies or manuals. Ticket T001: A customer could not pair a GlowMini GM-100 and saw E101. The agent confirmed the phone was on 5 GHz Wi-Fi. Switching to 2.4 GHz and repeating pairing resolved the issue. Source: glowmini-v1. Ticket T002: A customer asked whether an unused lamp delivered 20 days ago could be returned. The agent explained the 30-calendar-day request window, packaging and proof-of-purchase requirements, and the $6.99 change-of-mind return shipping deduction. The return request was referred to human support for processing. Source: returns-v1. Ticket T003: A package was marked delivered 2 hours earlier but could not be found. The agent advised checking entrances and household members and waiting until 24 hours after the delivery scan, then contacting human support if still missing. The ticket was closed after the customer later confirmed finding the package. Source: shipping-v1.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8a036922-f85a-4eef-9dd3-f5c8cf0aa6a7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "documents",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "5dd32299-09ea-4f0a-a6b9-22e3c5304d94",
+      "name": "Separate Documents"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const [itemIndex, item] of $input.all().entries()) {\n  // Handles either flat fields or a nested documents object.\n  const doc = item.json.documents ?? item.json;\n\n  if (!doc.source_id || typeof doc.text !== \"string\") {\n    throw new Error(`Missing source_id or text in item ${itemIndex}`);\n  }\n\n  const sentences = doc.text.trim().split(/(?<=[.!?])\\s+/);\n  let buffer = [];\n  let chunkNumber = 0;\n\n  function saveChunk() {\n    chunkNumber++;\n    const text = buffer.join(\" \");\n\n    output.push({\n      json: {\n        chunk_id: `${doc.source_id}-chunk-${chunkNumber}`,\n        source_id: doc.source_id,\n        title: doc.title,\n        type: doc.type,\n        language: doc.language,\n        synthetic: doc.synthetic,\n        chunk_number: chunkNumber,\n        text,\n        embedding_text: `${doc.title}\\n${text}`\n      },\n      pairedItem: { item: itemIndex }\n    });\n  }\n\n  for (const sentence of sentences) {\n    if (buffer.length && [...buffer, sentence].join(\" \").length > 900) {\n      saveChunk();\n      // Carry the last sentence into the next chunk.\n      buffer = buffer.length > 1 ? [buffer[buffer.length - 1]] : [];\n    }\n    buffer.push(sentence);\n  }\n\n  if (buffer.length) saveChunk();\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "d1a23935-ee6e-4bde-80e1-279ea43e9fdd",
+      "name": "Create Chunks"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "text-embedding-3-small"
+            },
+            {
+              "name": "=input",
+              "value": "={{ $json.embedding_text }}"
+            },
+            {
+              "name": "encoding_format",
+              "value": "float"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        0
+      ],
+      "id": "bb7fec75-6ca1-4018-bdb7-b389592dcfcc",
+      "name": "Generate Dense Embeddings"
+    },
+    {
+      "parameters": {
+        "jsCode": "const vectors = $input.all().map((item, index) => {\n  const chunk = $(\"Create Chunks\").itemMatching(index).json;\n  const values = item.json.data?.[0]?.embedding;\n\n  if (!Array.isArray(values) || values.length !== 1536) {\n    throw new Error(`Expected 1536 embedding values for item ${index}`);\n  }\n\n  return {\n    id: chunk.chunk_id,\n    values,\n    metadata: {\n      source_id: chunk.source_id,\n      title: chunk.title,\n      type: chunk.type,\n      language: chunk.language,\n      synthetic: chunk.synthetic,\n      chunk_number: chunk.chunk_number,\n      text: chunk.text\n    }\n  };\n});\n\nreturn [{\n  json: {\n    namespace: \"kb-v1\",\n    vectors\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "18862995-e678-48aa-9a8f-acd6e9118b7b",
+      "name": "Prepare Dense Records"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://REPLACE_DENSE_INDEX_HOST/vectors/upsert",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "478096df-6cf3-4ef7-a9ea-d5a1fa0a060b",
+      "name": "Upsert Dense Records"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pinecone.io/embed",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Pinecone-Api-Version",
+              "value": "2025-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  model: \"pinecone-sparse-english-v0\",\n  parameters: {\n    input_type: \"passage\"\n  },\n  inputs: [\n    { text: $json.embedding_text }\n  ]\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        912,
+        144
+      ],
+      "id": "2d382a83-771e-4355-9238-9b2a87d29fd3",
+      "name": "Generate Sparse Embeddings"
+    },
+    {
+      "parameters": {
+        "jsCode": "const vectors = $input.all().map((item, index) => {\n  const chunk = $(\"Create Chunks\").itemMatching(index).json;\n  const embedding = item.json.data?.[0];\n\n  const indices = embedding?.sparse_indices;\n  const values = embedding?.sparse_values;\n\n  if (\n    !Array.isArray(indices) ||\n    !Array.isArray(values) ||\n    indices.length === 0 ||\n    indices.length !== values.length\n  ) {\n    throw new Error(`Invalid sparse embedding for item ${index}`);\n  }\n\n  return {\n    id: chunk.chunk_id,\n    sparseValues: {\n      indices,\n      values\n    },\n    metadata: {\n      source_id: chunk.source_id,\n      title: chunk.title,\n      type: chunk.type,\n      language: chunk.language,\n      synthetic: chunk.synthetic,\n      chunk_number: chunk.chunk_number,\n      text: chunk.text\n    }\n  };\n});\n\nreturn [{\n  json: {\n    namespace: \"kb-v1\",\n    vectors\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        144
+      ],
+      "id": "7e5c7487-ae67-4d22-b061-8e787ffffca2",
+      "name": "Prepare Sparse Records"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://REPLACE_SPARSE_INDEX_HOST/vectors/upsert",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Pinecone-Api-Version",
+              "value": "2025-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1360,
+        144
+      ],
+      "id": "0d683ecc-ebf0-4166-9cbb-da0d2e953993",
+      "name": "Upsert Sparse Records"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Separate Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separate Documents": {
+      "main": [
+        [
+          {
+            "node": "Create Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Chunks": {
+      "main": [
+        [
+          {
+            "node": "Generate Dense Embeddings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Sparse Embeddings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Dense Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Prepare Dense Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Dense Records": {
+      "main": [
+        [
+          {
+            "node": "Upsert Dense Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Sparse Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Prepare Sparse Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sparse Records": {
+      "main": [
+        [
+          {
+            "node": "Upsert Sparse Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}

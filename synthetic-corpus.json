@@ -1,0 +1,44 @@
+{
+  "documents": [
+    {
+      "source_id": "shipping-v1",
+      "title": "Shipping Policy",
+      "type": "policy",
+      "language": "en",
+      "synthetic": true,
+      "text": "LumaHome shipping policy, version 1. Standard shipping is available within the contiguous United States. Orders are processed within 1–2 business days. Standard delivery takes 3–5 business days after dispatch. Business days exclude weekends and US federal holidays. Standard shipping costs $5.99 and is free for orders of $75 or more before tax. Tracking is sent by email after dispatch. Tracking updates may take 24 hours to appear. If tracking says delivered but the package is missing, check nearby entrances and with household members, then wait 24 hours. If it is still missing, contact human support for investigation. The bot cannot access live tracking or confirm an individual order's location. International shipping is not available."
+    },
+    {
+      "source_id": "returns-v1",
+      "title": "Returns and Refunds Policy",
+      "type": "policy",
+      "language": "en",
+      "synthetic": true,
+      "text": "LumaHome returns policy, version 1. Customers may request a return within 30 calendar days of delivery. Change-of-mind returns require an unused item in its original packaging with all accessories and proof of purchase. Final-sale items are excluded from change-of-mind returns. Return shipping for eligible change-of-mind returns costs $6.99, deducted from the refund. For damaged, defective, or incorrect items, contact human support with the order number and a description; photos may be requested. Human support determines the remedy and provides prepaid return shipping when a return is required for those cases. Do not promise a refund or replacement before review. Approved refunds are issued to the original payment method within 5–10 business days after the returned item passes inspection. The bot cannot approve returns, issue refunds, or check an individual refund's status. Requests outside the policy require human review."
+    },
+    {
+      "source_id": "orders-v1",
+      "title": "Orders and Payments FAQ",
+      "type": "faq",
+      "language": "en",
+      "synthetic": true,
+      "text": "LumaHome orders FAQ, version 1. Accepted payment methods are Visa, Mastercard, American Express, and PayPal. Gift cards and installment payments are not supported. Cancellation and delivery-address changes may be requested before dispatch, but are not guaranteed. Human support must check the order and process any change. After dispatch, cancellation and address changes are unavailable through LumaHome support. For a declined payment, verify billing details, check available funds, and contact the payment provider if the problem continues. Do not ask customers for full card numbers, card security codes, passwords, or one-time passcodes. Duplicate charges and suspected unauthorized transactions require human support review. The bot cannot inspect payments or modify orders."
+    },
+    {
+      "source_id": "glowmini-v1",
+      "title": "GlowMini GM-100 Setup and Troubleshooting Manual",
+      "type": "manual",
+      "language": "en",
+      "synthetic": true,
+      "text": "LumaHome fictional GlowMini GM-100 manual, version 1. GlowMini GM-100 is an indoor smart lamp. Use the supplied power adapter and keep the lamp dry. To pair it, connect the phone to a 2.4 GHz Wi-Fi network, enable Bluetooth, open the LumaHome app, and select Add Device, then GlowMini GM-100. The lamp does not support 5 GHz Wi-Fi. Hold the power button for 5 seconds until the indicator blinks blue to enter pairing mode. Error E101 means Wi-Fi connection failed: confirm the network is 2.4 GHz, check the Wi-Fi password, move closer to the router, and retry pairing. Error E202 means the lamp cannot reach the service: check the internet connection, restart the lamp, and retry after 10 minutes. If E101 or E202 persists after these steps, contact human support. A factory reset requires holding the power button for 10 seconds; it erases saved pairing settings. If the lamp smells burnt, sparks, or has a damaged cable, stop using it, disconnect power if safe, and contact human support. Do not attempt internal repairs."
+    },
+    {
+      "source_id": "tickets-v1",
+      "title": "Synthetic Resolved Support Tickets",
+      "type": "ticket_examples",
+      "language": "en",
+      "synthetic": true,
+      "text": "Training examples only. Tickets illustrate approved guidance and do not override policies or manuals. Ticket T001: A customer could not pair a GlowMini GM-100 and saw E101. The agent confirmed the phone was on 5 GHz Wi-Fi. Switching to 2.4 GHz and repeating pairing resolved the issue. Source: glowmini-v1. Ticket T002: A customer asked whether an unused lamp delivered 20 days ago could be returned. The agent explained the 30-calendar-day request window, packaging and proof-of-purchase requirements, and the $6.99 change-of-mind return shipping deduction. The return request was referred to human support for processing. Source: returns-v1. Ticket T003: A package was marked delivered 2 hours earlier but could not be found. The agent advised checking entrances and household members and waiting until 24 hours after the delivery scan, then contacting human support if still missing. The ticket was closed after the customer later confirmed finding the package. Source: shipping-v1."
+    }
+  ]
+}

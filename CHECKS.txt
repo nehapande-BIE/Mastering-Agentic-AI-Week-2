@@ -1,0 +1,9 @@
+Local review checks passed
+- Both workflow JSON files parse and connection targets exist.
+- All exported JavaScript Code nodes compile.
+- Exact uploaded corpus produces eight unique chunk IDs.
+- Weighted RRF fixture deduplicates and computes expected top score.
+- Validator accepts a matching-source fixture.
+- Validator escalates for invented evidence and missing inline citation.
+
+Mock inputs only; no live cloud/API replay or n8n import was performed.

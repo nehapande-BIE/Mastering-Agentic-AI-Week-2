@@ -1,0 +1,50 @@
+Workflow export review
+
+Confirmed by static inspection:
+- Both JSON files parse, referenced nodes/connection targets exist.
+- Search branches enter Merge in semantic/sparse order.
+- Dense and sparse namespace kb-v1 and chunk IDs agree by construction.
+- Translation precedes sparse query; original question is used for dense search
+  and final answer. No conversation-memory component exists.
+- Final answers/clarifications and successful inserts end in output reply nodes.
+- Both workflows inactive; no pinned output data in provided exports.
+- API keys are not embedded in the supplied exports. Credentials were referenced
+  by ID/name; sanitized copies remove these and account-specific metadata.
+- Index hosts and Data Table identity replaced with explicit setup placeholders.
+- Sanitized JSON is not immediately runnable until dependencies are configured.
+
+Known limitations / follow-up work (not silently changed in evaluated version):
+1. Confidence fallback uses model evidence_sufficient plus deterministic citation
+   and excerpt checks. No calibrated confidence score or retrieval relevance
+   threshold exists. Weighted RRF is a ranking score, not confidence.
+2. Validator checks each supplied excerpt sentence appears in source text. It
+   does not verify every answer claim, detect all contradictions, or require
+   every bracketed answer citation to be declared in citations. It checks inline
+   citation presence for answer decisions, but not for escalation/clarification.
+3. JSON mode is not strict schema enforcement. Null or malformed JSON shapes
+   can escape intended handling or throw: null evidence entries and truthy
+   non-string answers are examples. A parsed null draft can cause a runtime
+   dereference. Add schema validation with a controlled fallback in a new version.
+4. HTTP/network/quota failures stop execution rather than creating a review
+   record. Add error branches, bounded retries, and a customer-facing outage reply.
+5. Citation formatting produces avoidable escalations (3/10 observed). Prefer
+   model-returned structured claim/citation links plus deterministic rendering,
+   retaining source verification, rather than removing checks to improve scores.
+6. E101-specific instructions hard-code facts from the corpus into the prompt.
+   This weakens the purity of a retrieval-only demonstration; generalize these
+   instructions and rerun evaluation before claiming broad support capability.
+7. Knowledge text differs slightly from the initial conversation corpus, though
+   metadata marks all five sources synthetic. This archive uses the uploaded
+   ingestion corpus; no claim of byte identity with currently stored vectors.
+8. First sentence-based chunk may exceed 900 characters after overlap. Long
+   sentences, abbreviations, and version cleanup are not robustly handled.
+9. No semantic-only/keyword-only comparison validates the selected 0.6/0.4 weights.
+10. Escalation queue suffix and validation-failure fallback are English even for
+    Hindi. No full multilingual formal evaluation has been reported.
+11. One execution ID identifies a ticket, but insert is not idempotent across
+    retries; no external human notification or real customer contact capture.
+12. Source documents and manual claims are synthetic, not operational policies.
+
+Validation performed locally is described in CHECKS.txt. No OpenAI/Pinecone calls
+were made during review. Local mock checks do not establish cloud import or
+production behavior. Original uploaded files were not modified.
